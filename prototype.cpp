@@ -11,28 +11,25 @@ using namespace std;
 // Prototype接口
 class Prototype {
 public:
-    virtual ~Prototype() {}
-    virtual unique_ptr<Prototype> clone() const = 0;
+    virtual ~Prototype() = default;
+     [[nodiscard]] virtual unique_ptr<Prototype> clone() const = 0;
     virtual void print() const = 0;
 };
 
 // 具体原型类
 class ConcretePrototype : public Prototype {
 public:
-    ConcretePrototype(const string& name) : name(name) {}
+    explicit  ConcretePrototype(string name) : name(std::move(name)) {}
 
-    // 实现克隆方法
-    unique_ptr<Prototype> clone() const override {
+     [[nodiscard]] unique_ptr<Prototype> clone() const override {// 实现克隆方法
         return make_unique<ConcretePrototype>(*this);
     }
 
-    // 实现打印方法
-    void print() const override {
+    void print() const override {   // 实现打印方法
         cout << "ConcretePrototype [Name: " << name << "]" << endl;
     }
 
-    // 设置名称
-    void setName(const string& newName) {
+    void setName(const string& newName) {   // 设置名称
         name = newName;
     }
 
@@ -42,23 +39,20 @@ private:
 
 // 客户端代码
 int main() {
-    // 创建原型对象
-    unique_ptr<Prototype> prototype = make_unique<ConcretePrototype>("Prototype1");
-    cout << "Original ";
+    const auto prototype = make_unique<ConcretePrototype>("Prototype1");// 创建原型对象
+    cout << "原型 :";
     prototype->print();
 
-    // 克隆对象
-    unique_ptr<Prototype> clone = prototype->clone();
-    cout << "Cloned ";
+    const auto clone = prototype->clone();// 克隆对象
+    cout << "克隆 :";
     clone->print();
 
-    // 修改克隆对象的名称
-    dynamic_cast<ConcretePrototype*>(clone.get())->setName("Clone1");
-    cout << "Modified Cloned ";
+
+    dynamic_cast<ConcretePrototype*>(clone.get())->setName("Clone1");// 修改克隆对象的名称
+    cout << "修改的克隆 ";
     clone->print();
 
-    // 打印原始对象，验证是否被修改
-    cout << "Original ";
+    cout << "原型 ";// 打印原始对象，验证是否被修改
     prototype->print();
 
     return 0;
