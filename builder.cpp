@@ -32,7 +32,7 @@ private:
 // 抽象建造者
 class PizzaBuilder {
 public:
-    virtual ~PizzaBuilder() {}
+    virtual ~PizzaBuilder() = default;
     virtual void buildDough() = 0;
     virtual void buildSauce() = 0;
     virtual void buildTopping() = 0;
