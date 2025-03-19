@@ -4,23 +4,23 @@
 
 ## 设计模式原则
 
-1. 依赖倒置原则
+1. **依赖倒置原则**
    - 高层模块(稳定)不应该依赖于底层模块(变化),二者都应该依赖于抽象(稳定)
    - 抽象(稳定)不应该依赖于实现细节(变化),实现细节应该依赖于抽象(稳定)
-2. 开闭原则
+2. **开闭原则**
    - 对扩展开放，对更改关闭
    - 类模块应该是可扩展的，但是不可修改
-3. 接口隔离原则
+3. **接口隔离原则**
    - 使用多个专门的接口，而不使用单一的总接口，不应该强迫客户程序依赖它们不用的方法
    - 接口尽量细化，同时接口中的方法尽量少并且完备。
-4. 里氏替换原则
+4. **里氏替换原则**
    - 子类可以扩展父类的功能，但不能改变父类原有的功能
-5. 单一职责原则
+5. **单一职责原则**
    - 不要存在多余一个导致类变更的原因。一个类应该应该只负责一项职责。
    - 每个应该实现单一职责，否则就应该把类拆分，便于后期的维护
-6. 迪米特法则
+6. **迪米特法则**
    - 是指一个对象应该对其他对象保持最少的了解，又叫最少知道原则，尽量降低类与类之间的耦合。迪米特原则主要强调只和朋友交流，不和陌生人说话
-7. 合成复用原则
+7. **合成复用原则**
    - 组合优于继承
 
 
@@ -488,6 +488,8 @@ int main() {
 
 ## 结构型模式
 
+*结构型模式（Structural Patterns）是设计模式中的一种类型，主要用于**处理对象之间的组合关系**，以确保系统在结构上更加灵活、可扩展和可维护。结构型模式关注如何将类或对象组合成更大的结构，同时保持这些结构的灵活性和高效性。*
+
 ### 适配器模式
 
 **概念**
@@ -563,6 +565,222 @@ int main() {
 
     delete adaptee;// 释放内存
     delete adapter;
+    return 0;
+}
+```
+
+
+
+## 行为模式
+
+*行为模式（Behavioral Patterns）是设计模式中的一种类型，主要用于**处理对象之间的职责分配和通信**，以确保系统在行为上更加灵活、可扩展和可维护。行为模式关注对象之间的交互方式，定义对象如何协作以及如何分配职责。*
+
+### 策略模式
+
+**概念**
+
+在策略模式（Strategy Pattern）中一个类的行为或其算法可以在运行时更改。这种类型的设计模式属于行为型模式
+
+**意图**
+
+将每个算法封装起来，使它们可以互换使用。
+
+**组成部分**
+
+- **策略接口**：规定了所有策略类必须实现的方法。
+- **具体策略类**：实现了策略接口，包含具体的算法实现。
+
+**优点**
+
+1. **算法切换自由**：可以在运行时根据需要切换算法。
+2. **避免多重条件判断**：消除了复杂的条件语句。
+3. **扩展性好**：新增算法只需新增一个策略类，无需修改现有代码。
+
+**缺点**
+
+1. **策略类数量增多**：每增加一个算法，就需要增加一个策略类。
+2. **所有策略类都需要暴露**：策略类需要对外公开，以便可以被选择和使用。
+
+**例子**
+
+```c++
+#include <iostream>
+#include <cstdint>
+
+// 策略接口
+class Pay {
+public:
+    virtual void pay(double money) const = 0;
+    virtual ~Pay() = default;
+};
+
+// 具体策略：信用卡支付
+class CreditCardPay final: public Pay {
+public:
+    void pay(const double money) const override {
+        std::cout <<"Card Pay : "<< money << "\n";
+    }
+};
+
+// 具体策略：支付宝支付
+class AlipayPay final: public Pay {
+public:
+    void pay(const double money) const override {
+        std::cout <<"Alipay Pay : "<< money << "\n";
+    }
+};
+
+// 具体策略：微信支付
+class WechatPay final: public Pay {
+public:
+    void pay(const double money) const override {
+        std::cout <<"Wechat Pay : "<< money << "\n";
+    }
+};
+
+// 上下文类
+class PayContext {
+public:
+    explicit PayContext(Pay* strategy):myPay(strategy){}
+    ~PayContext() {
+        delete myPay;
+    };
+
+    void setPay(Pay* strategy) {
+        myPay = strategy;
+    }
+    void pay(const double money) const {
+        if (myPay) {
+            myPay->pay(money);
+        }else {
+            std::cerr << "Payment strategy not set!" << std::endl;
+        }
+    }
+private:
+    Pay * myPay;
+};
+
+int main() {
+    Pay* creditCard = new CreditCardPay();
+    Pay* alipay = new AlipayPay();
+    Pay* wechat = new WechatPay();
+
+    const PayContext pay1(creditCard);
+    const PayContext pay2(alipay);
+    const PayContext pay3(wechat);
+
+    pay1.pay(123);
+    pay2.pay(123);
+    pay3.pay(123);
+
+    return 0;
+}
+```
+
+
+
+### 观察者模式
+
+**概念**
+
+它定义了一种一对多的依赖关系，当一个对象的状态发生改变时，其所有依赖者都会收到通知并自动更新
+
+**意图**
+
+创建了对象间的一种一对多的依赖关系，当一个对象状态改变时，所有依赖于它的对象都会得到通知并自动更新。。
+
+**实现方式**
+
+- **定义观察者接口**：包含一个更新方法。
+- **创建具体观察者**：实现观察者接口，定义接收到通知时的行为。
+- **定义主题接口**：包含添加、删除和通知观察者的方法。
+- **创建具体主题**：实现主题接口，管理观察者列表，并在状态改变时通知它们。
+
+**优点**
+
+- **抽象耦合**：观察者和主题之间是抽象耦合的。
+- **触发机制**：建立了一套状态改变时的触发和通知机制。
+
+**缺点**
+
+- **性能问题**：如果观察者众多，通知过程可能耗时。
+- **循环依赖**：可能导致循环调用和系统崩溃。
+- **缺乏变化详情**：观察者不知道主题如何变化，只知道变化发生。
+
+**例子**
+
+```c++
+#include <string>
+#include <vector>
+#include <iostream>
+
+// 观察者接口
+class Observer {
+public:
+    virtual void update(const std::string& message) = 0;
+    virtual ~Observer() = default;
+};
+
+// 被观察者
+class Subject {
+public:
+    void attach(Observer* observer) {
+        observers.push_back(observer);
+    }
+
+    void detach(Observer* observer) {
+        std::erase(observers, observer);
+    }
+
+    void notify(const std::string& message) const{
+        for (Observer* observer : observers) {
+            observer->update(message);
+        }
+    }
+
+private:
+    std::vector<Observer*> observers;
+};
+
+
+// 具体观察者：邮件通知
+class EmailObserver final: public Observer {
+public:
+    explicit  EmailObserver(std::string email) : email(std::move(email)) {}
+
+    void update(const std::string& message) override {
+        std::cout << "Email to " << email << ": " << message << std::endl;
+    }
+
+private:
+    std::string email;
+};
+
+// 具体观察者：短信通知
+class SmsObserver final: public Observer {
+public:
+    explicit SmsObserver(std::string phone) : phone(std::move(phone)) {}
+
+    void update(const std::string& message) override {
+        std::cout << "SMS to " << phone << ": " << message << std::endl;
+    }
+
+private:
+    std::string phone;
+};
+
+int main() {
+    Subject subject;
+    EmailObserver emailObserver("alice@example.com");
+    SmsObserver smsObserver("1234567890");
+
+    // 注册观察者
+    subject.attach(&emailObserver);
+    subject.attach(&smsObserver);
+
+    subject.notify("Hello, World!");            // 模拟状态变化并通知观察者
+    subject.detach(&smsObserver);                           // 移除一个观察者
+    subject.notify("Goodbye!");                 // 再次通知观察者
     return 0;
 }
 ```
